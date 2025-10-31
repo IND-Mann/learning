@@ -1,23 +1,53 @@
-import logo from './logo.svg';
-import './App.css';
+
+import Navbar from "./components/Navbar";
+import Filter from "./components/Filter";
+import Cards from "./components/Cards";
+import { apiUrl, FilterData } from "./Data";
+import { useEffect, useState } from "react";
+import Spinner from "./components/Spinner";
+
 
 function App() {
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading]= useState();
+  const [category, setCategory] = useState(FilterData[0].title)
+
+
+
+  async function fetchData() {
+    setLoading(true);
+    try {
+      let response = await fetch(apiUrl);
+      let op = await response.json();
+      setCourses(op.data);
+      console.log(op.data)
+    } catch (err) {
+      console.log(" problem")
+    }
+    
+    setLoading(false);
+  }
+
+  useEffect(()=>{
+    fetchData();
+  },[])
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <div>
+        <Navbar />
+      </div>
+      <div>
+        <Filter FilterData={FilterData}
+        category={category}
+        setCategory={setCategory} />
+      </div>
+      <div style={{display: 'flex', justifyContent: 'center',alignItems: 'center'}}>
+        { loading ? <Spinner/> : <Cards 
+        category={category}
+        courses={courses}
+        />
+}
+      </div>
     </div>
   );
 }
